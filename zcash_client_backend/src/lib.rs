@@ -6,3 +6,4 @@
 pub mod constants;
 pub mod encoding;
 pub mod keys;
+pub mod proto;
