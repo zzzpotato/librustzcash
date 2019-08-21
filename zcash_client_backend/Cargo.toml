@@ -12,6 +12,7 @@ ff = { path = "../ff" }
 hex = "0.3"
 pairing = { path = "../pairing" }
 protobuf = "2"
+subtle = "2"
 zcash_primitives = { path = "../zcash_primitives" }
 
 [build-dependencies]
