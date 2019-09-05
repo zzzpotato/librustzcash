@@ -15,6 +15,12 @@ extern crate rand_core;
 extern crate rand_os;
 extern crate sha2;
 
+#[cfg(feature = "transparent-inputs")]
+extern crate ripemd160;
+
+#[cfg(feature = "transparent-inputs")]
+extern crate secp256k1;
+
 #[cfg(test)]
 #[macro_use]
 extern crate hex_literal;
