@@ -1,7 +1,7 @@
+use crate::jubjub::{edwards, Unknown};
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use ff::{PrimeField, PrimeFieldRepr};
 use pairing::bls12_381::{Bls12, Fr, FrRepr};
-use crate::jubjub::{edwards, Unknown};
 use std::io::{self, Read, Write};
 
 use legacy::Script;
@@ -26,6 +26,10 @@ pub struct OutPoint {
 }
 
 impl OutPoint {
+    pub fn new(hash: [u8; 32], n: u32) -> Self {
+        OutPoint { hash, n }
+    }
+
     pub fn read<R: Read>(mut reader: R) -> io::Result<Self> {
         let mut hash = [0; 32];
         reader.read_exact(&mut hash)?;
