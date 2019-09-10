@@ -494,9 +494,10 @@ impl<R: RngCore + CryptoRng> Builder<R> {
         tx_metadata.spend_indices.resize(spends.len(), 0);
         tx_metadata.output_indices.resize(orig_outputs_len, 0);
 
+        // Create Sapling SpendDescriptions
         if spends.len() > 0 {
             let anchor = self.anchor.expect("anchor was set if spends were added");
-            // Create Sapling SpendDescriptions
+        
             for (i, (pos, spend)) in spends.iter().enumerate() {
                 let proof_generation_key = spend.extsk.expsk.proof_generation_key(&JUBJUB);
 
