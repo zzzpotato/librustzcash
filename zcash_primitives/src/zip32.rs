@@ -1,10 +1,11 @@
 use aes::Aes256;
-use blake2_rfc::blake2b::Blake2b;
+use blake2b_simd::Params as Blake2bParams;
 use byteorder::{ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 use ff::Field;
 use fpe::ff1::{BinaryNumeralString, FF1};
 use pairing::bls12_381::Bls12;
-use sapling_crypto::{
+
+use crate::{
     jubjub::{fs::Fs, FixedGenerators, JubjubEngine, JubjubParams, ToUniform},
     primitives::{Diversifier, PaymentAddress, ViewingKey},
 };
@@ -33,7 +34,10 @@ struct FVKFingerprint([u8; 32]);
 
 impl<E: JubjubEngine> From<&FullViewingKey<E>> for FVKFingerprint {
     fn from(fvk: &FullViewingKey<E>) -> Self {
-        let mut h = Blake2b::with_params(32, &[], &[], ZIP32_SAPLING_FVFP_PERSONALIZATION);
+        let mut h = Blake2bParams::new()
+            .hash_length(32)
+            .personal(ZIP32_SAPLING_FVFP_PERSONALIZATION)
+            .to_state();
         h.update(&fvk.to_bytes());
         let mut fvfp = [0u8; 32];
         fvfp.copy_from_slice(h.finalize().as_bytes());
@@ -94,7 +98,7 @@ struct ChainCode([u8; 32]);
 pub struct DiversifierIndex(pub [u8; 11]);
 
 impl DiversifierIndex {
-    fn new() -> Self {
+    pub fn new() -> Self {
         DiversifierIndex([0; 11])
     }
 
@@ -113,10 +117,10 @@ impl DiversifierIndex {
 
 /// A key used to derive diversifiers for a particular child key
 #[derive(Clone, Copy, Debug, PartialEq)]
-struct DiversifierKey([u8; 32]);
+pub struct DiversifierKey(pub [u8; 32]);
 
 impl DiversifierKey {
-    fn master(sk_m: &[u8]) -> Self {
+    pub fn master(sk_m: &[u8]) -> Self {
         let mut dk_m = [0u8; 32];
         dk_m.copy_from_slice(&prf_expand(sk_m, &[0x10]).as_bytes()[..32]);
         DiversifierKey(dk_m)
@@ -131,7 +135,10 @@ impl DiversifierKey {
     /// Returns the first index starting from j that generates a valid
     /// diversifier, along with the corresponding diversifier. Returns
     /// an error if the diversifier space is exhausted.
-    fn diversifier(&self, mut j: DiversifierIndex) -> Result<(DiversifierIndex, Diversifier), ()> {
+    pub fn diversifier(
+        &self,
+        mut j: DiversifierIndex,
+    ) -> Result<(DiversifierIndex, Diversifier), ()> {
         let ff = FF1::<Aes256>::new(&self.0, 2).unwrap();
         loop {
             // Generate d_j
@@ -225,9 +232,10 @@ impl std::fmt::Debug for ExtendedFullViewingKey {
 
 impl ExtendedSpendingKey {
     pub fn master(seed: &[u8]) -> Self {
-        let mut h = Blake2b::with_params(64, &[], &[], ZIP32_SAPLING_MASTER_PERSONALIZATION);
-        h.update(seed);
-        let i = h.finalize();
+        let i = Blake2bParams::new()
+            .hash_length(64)
+            .personal(ZIP32_SAPLING_MASTER_PERSONALIZATION)
+            .hash(seed);
 
         let sk_m = &i.as_bytes()[..32];
         let mut c_m = [0u8; 32];

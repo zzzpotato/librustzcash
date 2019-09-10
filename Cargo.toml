@@ -5,8 +5,8 @@ members = [
     "group",
     "librustzcash",
     "pairing",
-    "sapling-crypto",
     "zcash_client_backend",
+    "zcash_client_sqlite",
     "zcash_primitives",
     "zcash_proofs",
 ]

@@ -7,10 +7,19 @@ authors = [
 edition = "2018"
 
 [dependencies]
-bech32 = "0.6"
+bech32 = "0.7"
+bs58 = { version = "0.2", features = ["check"] }
+ff = { path = "../ff" }
+hex = "0.3"
 pairing = { path = "../pairing" }
-sapling-crypto = { path = "../sapling-crypto" }
+protobuf = "2"
+subtle = "2"
 zcash_primitives = { path = "../zcash_primitives" }
 
+[build-dependencies]
+protobuf-codegen-pure = "2"
+
 [dev-dependencies]
-rand = "0.4"
+rand_core = "0.5"
+rand_os = "0.2"
+rand_xorshift = "0.2"
