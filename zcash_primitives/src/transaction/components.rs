@@ -21,8 +21,8 @@ const ZC_NUM_JS_OUTPUTS: usize = 2;
 
 #[derive(Debug)]
 pub struct OutPoint {
-    hash: [u8; 32],
-    n: u32,
+    pub hash: [u8; 32],
+    pub n: u32,
 }
 
 impl OutPoint {
