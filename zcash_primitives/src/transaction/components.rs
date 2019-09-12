@@ -1,7 +1,7 @@
+use crate::jubjub::{edwards, Unknown};
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use ff::{PrimeField, PrimeFieldRepr};
 use pairing::bls12_381::{Bls12, Fr, FrRepr};
-use crate::jubjub::{edwards, Unknown};
 use std::io::{self, Read, Write};
 
 use legacy::Script;
@@ -19,7 +19,7 @@ const PHGR_PROOF_SIZE: usize = (33 + 33 + 65 + 33 + 33 + 33 + 33 + 33);
 const ZC_NUM_JS_INPUTS: usize = 2;
 const ZC_NUM_JS_OUTPUTS: usize = 2;
 
-#[derive(Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct OutPoint {
     hash: [u8; 32],
     n: u32,
@@ -75,7 +75,7 @@ impl TxIn {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct TxOut {
     pub value: Amount,
     pub script_pubkey: Script,
