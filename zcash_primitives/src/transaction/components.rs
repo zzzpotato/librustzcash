@@ -19,7 +19,7 @@ const PHGR_PROOF_SIZE: usize = (33 + 33 + 65 + 33 + 33 + 33 + 33 + 33);
 const ZC_NUM_JS_INPUTS: usize = 2;
 const ZC_NUM_JS_OUTPUTS: usize = 2;
 
-#[derive(Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct OutPoint {
     pub hash: [u8; 32],
     pub n: u32,
@@ -79,7 +79,7 @@ impl TxIn {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct TxOut {
     pub value: Amount,
     pub script_pubkey: Script,
