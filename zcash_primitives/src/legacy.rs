@@ -63,17 +63,6 @@ impl Script {
             None
         }
     }
-
-    pub fn public_key(&self) -> Option<[u8; 33]> {
-        // TODO: How to more reliably parse this? The len could be anything, really.
-        if self.0.len() == 107 || self.0.len() == 106 {
-            let mut pk = [0u8; 33];
-            pk.copy_from_slice(&self.0[self.0.len() - 33..self.0.len()]);
-            Some(pk)
-        } else {
-            None
-        }
-    }
 }
 
 impl Shl<OpCode> for Script {
