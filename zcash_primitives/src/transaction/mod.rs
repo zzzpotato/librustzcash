@@ -38,8 +38,8 @@ impl fmt::Display for TxId {
 /// A Zcash transaction.
 #[derive(Debug)]
 pub struct Transaction {
-    txid: TxId,
-    data: TransactionData,
+    pub txid: TxId,
+    pub data: TransactionData,
 }
 
 impl Deref for Transaction {
