@@ -13,7 +13,6 @@ use zcash_primitives::{
 };
 use zcash_primitives::{
     legacy::TransparentAddress,
-    keys::ExpandedSpendingKey,
     zip32::{ExtendedFullViewingKey, ExtendedSpendingKey},
     JUBJUB,
 };
@@ -37,25 +36,6 @@ where
     } else {
         Ok(None)
     }
-}
-
-
-/// Writes an [`ExpandedSpendingKey`] as a Bech32-encoded string.
-///
-/// # Examples
-///
-/// ```
-/// use zcash_client_backend::{
-///     constants::testnet::{COIN_TYPE, HRP_SAPLING_EXPANDED_SPENDING_KEY},
-///     encoding::encode_expanded_spending_key,
-///     keys::spending_key,
-/// };
-///
-/// let expsk = spending_key(&[0; 32][..], COIN_TYPE, 0).expsk;
-/// let encoded = encode_expanded_spending_key(HRP_SAPLING_EXPANDED_SPENDING_KEY, &expsk);
-/// ```
-pub fn encode_expanded_spending_key(htp: &str, sk: &ExpandedSpendingKey<Bls12>) -> String {
-    bech32_encode(htp, |w| sk.write(w))
 }
 
 /// Writes an [`ExtendedSpendingKey`] as a Bech32-encoded string.
