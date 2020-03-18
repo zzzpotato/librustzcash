@@ -6,7 +6,7 @@ authors = [
 ]
 
 [dependencies]
-bellman = { path = "../bellman" }
+bellman = { path = "../bellman", default-features = false, features = ["groth16"]}
 blake2b_simd = "0.5"
 byteorder = "1"
 directories = { version = "1", optional = true }

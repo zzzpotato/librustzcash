@@ -14,7 +14,7 @@ path = "src/rustzcash.rs"
 crate-type = ["staticlib"]
 
 [dependencies]
-bellman = { path = "../bellman" }
+bellman = { path = "../bellman", default-features = false features = ["groth16"]}
 blake2b_simd = "0.5"
 blake2s_simd = "0.5"
 ff = { path = "../ff" }
