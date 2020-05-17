@@ -1,6 +1,6 @@
 //! Generated code for handling light client protobuf structs.
 
-use ff::{PrimeField};
+use ff::PrimeField;
 use pairing::bls12_381::{Bls12, Fr, FrRepr};
 use zcash_primitives::{
     block::{BlockHash, BlockHeader},
