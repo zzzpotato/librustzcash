@@ -9,10 +9,10 @@ use bech32::{self, Error, FromBase32, ToBase32};
 use pairing::bls12_381::Bls12;
 use std::io::{self, Write};
 use zcash_primitives::{
+    legacy::TransparentAddress,
     primitives::PaymentAddress,
     zip32::{ExtendedFullViewingKey, ExtendedSpendingKey},
     JUBJUB,
-    legacy::TransparentAddress,
 };
 
 fn bech32_encode<F>(hrp: &str, write: F) -> String
@@ -176,7 +176,6 @@ pub fn decode_payment_address(hrp: &str, s: &str) -> Result<Option<PaymentAddres
         PaymentAddress::<Bls12>::from_bytes(&bytes, &JUBJUB)
     })
 }
-
 
 /// Decodes a [`TransparentAddress`] from a Base58Check-encoded string.
 ///
