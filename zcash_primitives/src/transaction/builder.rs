@@ -890,38 +890,6 @@ mod tests {
         );
     }
 
-    #[cfg(feature = "transparent-inputs")]
-    #[test]
-    fn binding_sig_absent_if_no_shielded_spend_or_output() {
-        use crate::transaction::{
-            builder::{self, TransparentInputs},
-            TransactionData,
-        };
-
-        // Create a builder with 0 fee, so we can construct t outputs
-        let mut builder = builder::Builder {
-            rng: OsRng,
-            mtx: TransactionData::new(),
-            fee: Amount::zero(),
-            anchor: None,
-            spends: vec![],
-            outputs: vec![],
-            transparent_inputs: TransparentInputs::default(),
-            change_address: None,
-        };
-
-        // Create a tx with only t output. No binding_sig should be present
-        builder
-            .add_transparent_output(&TransparentAddress::PublicKey([0; 20]), Amount::zero())
-            .unwrap();
-
-        let (tx, _) = builder
-            .build(consensus::BranchId::Sapling, &MockTxProver)
-            .unwrap();
-        // No binding signature, because only t input and outputs
-        assert!(tx.binding_sig.is_none());
-    }
-
     #[test]
     fn binding_sig_absent_if_no_shielded_spend_or_output() {
         use crate::consensus::NetworkUpgrade;

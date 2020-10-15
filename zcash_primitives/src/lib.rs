@@ -19,7 +19,6 @@ extern crate hex_literal;
 
 #[cfg(test)]
 extern crate rand_xorshift;
-use lazy_static::lazy_static;
 
 pub mod block;
 pub mod consensus;
