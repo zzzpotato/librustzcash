@@ -5,7 +5,7 @@ use hex;
 use sha2::{Digest, Sha256};
 use std::fmt;
 use std::io::{self, Read, Write};
-use std::ops::{Deref, DerefMut};
+use std::ops::Deref;
 
 use crate::{consensus::BlockHeight, redjubjub::Signature, serialize::Vector};
 
@@ -50,14 +50,8 @@ impl fmt::Display for TxId {
 /// A Zcash transaction.
 #[derive(Debug, Clone)]
 pub struct Transaction {
-    txid: TxId,
-    data: TransactionData,
-}
-
-impl Transaction {
-    pub fn new(txid: TxId, data: TransactionData) -> Self {
-        Transaction { txid, data }
-    }
+    pub txid: TxId,
+    pub data: TransactionData,
 }
 
 impl Deref for Transaction {
@@ -65,12 +59,6 @@ impl Deref for Transaction {
 
     fn deref(&self) -> &TransactionData {
         &self.data
-    }
-}
-
-impl DerefMut for Transaction {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.data
     }
 }
 
