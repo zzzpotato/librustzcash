@@ -24,10 +24,10 @@ const PHGR_PROOF_SIZE: usize = 33 + 33 + 65 + 33 + 33 + 33 + 33 + 33;
 const ZC_NUM_JS_INPUTS: usize = 2;
 const ZC_NUM_JS_OUTPUTS: usize = 2;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct OutPoint {
-    pub hash: [u8; 32],
-    pub n: u32,
+    hash: [u8; 32],
+    n: u32,
 }
 
 impl OutPoint {
