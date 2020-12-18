@@ -5,6 +5,7 @@ use std::error;
 use std::fmt;
 use std::marker::PhantomData;
 
+use consensus::NetworkUpgrade;
 use ff::Field;
 use rand::{rngs::OsRng, seq::SliceRandom, CryptoRng, RngCore};
 
@@ -21,7 +22,7 @@ use crate::{
     sapling::{spend_sig, Node},
     transaction::{
         components::{
-            amount::Amount, amount::DEFAULT_FEE, OutPoint, OutputDescription, SpendDescription,
+            amount::Amount, OutPoint, OutputDescription, SpendDescription,
             TxOut, TzeIn, TzeOut,
         },
         signature_hash_data, SignableInput, Transaction, TransactionData, SIGHASH_ALL,
@@ -417,13 +418,21 @@ impl<'a, P: consensus::Parameters, R: RngCore + CryptoRng> Builder<'a, P, R> {
         mut mtx: TransactionData,
     ) -> Builder<'a, P, R> {
         mtx.expiry_height = height + DEFAULT_TX_EXPIRY_DELTA;
+        
+        const ZIP313_GRACE_PERIOD_BLOCKS:u64 = 33_600;
+        let canopy_height: u64 = params.activation_height(NetworkUpgrade::Canopy).unwrap().into();
+        let fee = if height >= BlockHeight::from(ZIP313_GRACE_PERIOD_BLOCKS + canopy_height) {
+            Amount::from_u64(1000).unwrap()
+        } else {
+            Amount::from_u64(10000).unwrap()
+        };
 
         Builder {
             params,
             rng,
             height,
             mtx,
-            fee: DEFAULT_FEE,
+            fee,
             anchor: None,
             spends: vec![],
             outputs: vec![],
