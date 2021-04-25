@@ -1,6 +1,6 @@
 //! Structs for building transactions.
 
-use std::boxed::Box;
+use std::{boxed::Box, sync::mpsc::Sender};
 use std::error;
 use std::fmt;
 use std::marker::PhantomData;
@@ -342,6 +342,7 @@ pub struct Builder<'a, P: consensus::Parameters, R: RngCore + CryptoRng> {
     tze_inputs: TzeInputs<'a, TransactionData>,
     change_address: Option<(OutgoingViewingKey, PaymentAddress)>,
     phantom: PhantomData<P>,
+    progress_notifier: Option<Sender<u32>>
 }
 
 impl<'a, P: consensus::Parameters> Builder<'a, P, OsRng> {
@@ -374,6 +375,10 @@ impl<'a, P: consensus::Parameters> Builder<'a, P, OsRng> {
     /// integration testing of new features.
     pub fn new_zfuture(params: P, height: BlockHeight) -> Self {
         Builder::new_with_rng_zfuture(params, height, OsRng)
+    }
+
+    pub fn set_progress_notifier(&mut self, tx: Sender<u32>) {
+        self.progress_notifier = Some(tx);
     }
 }
 
@@ -442,6 +447,7 @@ impl<'a, P: consensus::Parameters, R: RngCore + CryptoRng> Builder<'a, P, R> {
             tze_inputs: TzeInputs::default(),
             change_address: None,
             phantom: PhantomData,
+            progress_notifier: None,
         }
     }
 
@@ -646,6 +652,9 @@ impl<'a, P: consensus::Parameters, R: RngCore + CryptoRng> Builder<'a, P, R> {
         // Record if we'll need a binding signature
         let binding_sig_needed = !spends.is_empty() || !outputs.is_empty();
 
+        let mut progress= 0u32;
+        let tx = &self.progress_notifier;
+
         // Create Sapling SpendDescriptions
         if !spends.is_empty() {
             let anchor = self.anchor.expect("anchor was set if spends were added");
@@ -671,6 +680,9 @@ impl<'a, P: consensus::Parameters, R: RngCore + CryptoRng> Builder<'a, P, R> {
                         spend.merkle_path.clone(),
                     )
                     .map_err(|()| Error::SpendProof)?;
+
+                progress += 1;
+                tx.as_ref().map(|tx| tx.send(progress));
 
                 self.mtx.shielded_spends.push(SpendDescription {
                     cv,
@@ -742,7 +754,6 @@ impl<'a, P: consensus::Parameters, R: RngCore + CryptoRng> Builder<'a, P, R> {
                     dummy_note.rcm(),
                     dummy_note.value,
                 );
-
                 let cmu = dummy_note.cmu();
 
                 let mut enc_ciphertext = [0u8; 580];
@@ -759,6 +770,9 @@ impl<'a, P: consensus::Parameters, R: RngCore + CryptoRng> Builder<'a, P, R> {
                     zkproof,
                 }
             };
+
+            progress += 1;
+            tx.as_ref().map(|tx| tx.send(progress));
 
             self.mtx.shielded_outputs.push(output_desc);
         }
@@ -813,7 +827,7 @@ impl<'a, P: consensus::Parameters, R: RngCore + CryptoRng> Builder<'a, P, R> {
         // Transparent signatures
         self.transparent_inputs
             .apply_signatures(&mut self.mtx, consensus_branch_id);
-
+            
         Ok((
             self.mtx.freeze().expect("Transaction should be complete"),
             tx_metadata,
@@ -927,6 +941,7 @@ mod tests {
             tze_inputs: TzeInputs::default(),
             change_address: None,
             phantom: PhantomData,
+            progress_notifier: None,
         };
 
         // Create a tx with only t output. No binding_sig should be present
